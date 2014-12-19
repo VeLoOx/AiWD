@@ -45,13 +45,13 @@ public class CVSParser {
 	}
 
 	public FileInputStream loadFile(String path, String name) {
-		if(path==null) {
+		if (path == null) {
 			path = cvsFilePath;
 			name = cvsFileName;
-			}
-		
+		}
+
 		try {
-			FileInputStream f = new FileInputStream(path+name);
+			FileInputStream f = new FileInputStream(path + name);
 			return f;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -59,32 +59,32 @@ public class CVSParser {
 
 		return null;
 	}
-	
-	private String takeNumbNormalizeAndRetString(String numb, double min, double max, double newMin, double newMax){
+
+	private String takeNumbNormalizeAndRetString(String numb, double min,
+			double max, double newMin, double newMax) {
 		String n = "";
-		
+
 		double val = Double.parseDouble(numb);
-		
-		double newVal = ((val-min)/(max-min))*(newMax-newMin)+newMin;
+
+		double newVal = ((val - min) / (max - min)) * (newMax - newMin)
+				+ newMin;
 		n = String.valueOf(newVal);
-		
+
 		return n;
 	}
 
-	//############ samo miesko
+	// ############ samo miesko
 	public void procesMinMaxFile(FileInputStream fis) {
-		
+
 		InputStreamReader isr = null;
-		
+
 		BufferedReader reader = null;
 		try {
-			
+
 			fis.getChannel().position(0);
 			isr = new InputStreamReader(fis);
 			reader = new BufferedReader(isr);
-			
-			
-			
+
 			line = reader.readLine();
 			initializeMinMaxMap(line);
 
@@ -93,7 +93,7 @@ public class CVSParser {
 				for (int i = 0; i < col.length; i++) {
 					// przetwarzanie kazdej lini cvs
 
-					double[] tab = columnMinMaxMap.get(columnNames[i]); 
+					double[] tab = columnMinMaxMap.get(columnNames[i]);
 
 					double val = Double.parseDouble(col[i]);
 					if (val < tab[0])
@@ -108,67 +108,67 @@ public class CVSParser {
 				}
 				if (show)
 					System.out.println(" DONE");
-				
+
 				linesNumber++;
 			}
 		} catch (IOException e) {
 
 		}
 	}
-	
-	public void procesNormalizeFile (String path, String name,FileInputStream fis, double newMin, double newMax){
-		
-		if(path==null) {
+
+	public void procesNormalizeFile(String path, String name,
+			FileInputStream fis, double newMin, double newMax) {
+
+		if (path == null) {
 			path = cvsFilePath;
 			name = newCvsFileName;
-			}
-		
+		}
+
 		InputStreamReader isr = null;
-		BufferedReader reader = null;	
+		BufferedReader reader = null;
 		PrintWriter out = null;
 		try {
-			out = new PrintWriter(path+name);
+			out = new PrintWriter(path + name);
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-				
+
 		try {
 			fis.getChannel().position(0);
 			isr = new InputStreamReader(fis);
 			reader = new BufferedReader(isr);
-			
-			line = reader.readLine(); //pominiecie lini z nazwami kolumn
+
+			line = reader.readLine(); // pominiecie lini z nazwami kolumn
 			out.println(line);
-			
+
 			while ((line = reader.readLine()) != null) {
-				
+
 				String[] col = line.split(separator);
-				String newLine="";
-				
-				for (int i = 0; i < col.length; i++){
+				String newLine = "";
+
+				for (int i = 0; i < col.length; i++) {
 					double[] mm = columnMinMaxMap.get(columnNames[i]);
-					
-					String newVal = takeNumbNormalizeAndRetString(col[i], mm[0], mm[1], newMin, newMax);
-					
-					newLine=newLine+newVal+";"; //utworzenie nowej lini
+
+					String newVal = takeNumbNormalizeAndRetString(col[i],
+							mm[0], mm[1], newMin, newMax);
+
+					newLine = newLine + newVal + ";"; // utworzenie nowej lini
 				}
-				
-				out.println(newLine.substring(0, newLine.length()-1));
+
+				out.println(newLine.substring(0, newLine.length() - 1));
 			}
-			
+
 			out.close();
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
 	}
-	
-	//################ wyswietlanie
+
+	// ################ wyswietlanie
 
 	public void showMap() {
 		System.out.println("\nNAZWA :   MIN VAL    :    MAX VAL   ");
@@ -179,9 +179,9 @@ public class CVSParser {
 		}
 		System.out.println("\nPrzeczytano lacznie " + linesNumber + " lini");
 	}
-	
-	public void setComunicates(boolean s){
-		show=s;
+
+	public void setComunicates(boolean s) {
+		show = s;
 	}
 
 	public String getSeparator() {
@@ -219,16 +219,15 @@ public class CVSParser {
 	public static void main(String[] args) {
 		CVSParser cvsp = new CVSParser();
 		cvsp.setComunicates(false);
-		
-		
-		FileInputStream readFile = cvsp.loadFile(null,null);
+
+		FileInputStream readFile = cvsp.loadFile(null, null);
 
 		cvsp.procesMinMaxFile(readFile);
 
 		cvsp.showMap();
-		
-		cvsp.procesNormalizeFile(null,null,readFile, 0, 1);
-		
+
+		cvsp.procesNormalizeFile(null, null, readFile, 0, 1);
+
 		try {
 			readFile.close();
 		} catch (IOException e) {

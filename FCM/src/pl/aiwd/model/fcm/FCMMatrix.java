@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.Random;
 
+import pl.aiwd.parsers.map.FCMParser;
+
 public class FCMMatrix {
 
 	private int numberOfFactors; // liczba czynnikow mapy
@@ -26,6 +28,30 @@ public class FCMMatrix {
 		fcmMatrix = new double[numberOfFactors][numberOfFactors];
 
 		factorsNames = lista;
+	}
+
+	public int getNumberOfFactors() {
+		return numberOfFactors;
+	}
+
+	public void setNumberOfFactors(int numberOfFactors) {
+		this.numberOfFactors = numberOfFactors;
+	}
+
+	public double[][] getFcmMatrix() {
+		return fcmMatrix;
+	}
+
+	public void setFcmMatrix(double[][] fcmMatrix) {
+		this.fcmMatrix = fcmMatrix;
+	}
+
+	public ArrayList<String> getFactorsNames() {
+		return factorsNames;
+	}
+
+	public void setFactorsNames(ArrayList<String> factorsNames) {
+		this.factorsNames = factorsNames;
 	}
 
 	public void addFactor(String name) throws FullFCMException {
@@ -116,12 +142,19 @@ public class FCMMatrix {
 		
 		System.out.println(fcm.toString());
 		
-		try {
+		FCMParser p = new FCMParser();
+		
+		double[] vec = p.matrixToVector(fcm.getFcmMatrix());
+		p.printVector(vec);
+		
+		fcm.setFcmMatrix(p.vectorToMatrix(vec, fcm.getNumberOfFactors(), fcm.getNumberOfFactors()));
+		
+		/*try {
 			fcm.setRelation("C1", "C3", 0.23);
 		} catch (FactorNotPresentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		System.out.println(fcm.toString());
 	}
