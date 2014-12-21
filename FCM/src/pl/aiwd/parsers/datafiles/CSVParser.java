@@ -6,10 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CVSParser {
+public class CSVParser {
 
 	private String separator = ";";
 	private String cvsFilePath = "D:\\Studia\\przedmioty2_2\\AiWD\\Projekt2\\git\\FCM\\Data\\";
@@ -64,6 +65,7 @@ public class CVSParser {
 			double max, double newMin, double newMax) {
 		String n = "";
 
+		numb = numb.replace(",", ".");
 		double val = Double.parseDouble(numb);
 
 		double newVal = ((val - min) / (max - min)) * (newMax - newMin)
@@ -75,7 +77,7 @@ public class CVSParser {
 
 	// ############ samo miesko
 	public void procesMinMaxFile(FileInputStream fis) {
-
+		if(show) System.out.println("-----------MIN/MAX processing : START");
 		InputStreamReader isr = null;
 
 		BufferedReader reader = null;
@@ -94,6 +96,8 @@ public class CVSParser {
 					// przetwarzanie kazdej lini cvs
 
 					double[] tab = columnMinMaxMap.get(columnNames[i]);
+					
+				    col[i] = col[i].replace(",", ".");
 
 					double val = Double.parseDouble(col[i]);
 					if (val < tab[0])
@@ -114,11 +118,17 @@ public class CVSParser {
 		} catch (IOException e) {
 
 		}
+		
+		if(show) {
+			System.out.println("\nPrzeczytano lacznie " + linesNumber + " lini");
+			System.out.println("-----------MIN/MAX processing : END");
+		}
 	}
 
 	public void procesNormalizeFile(String path, String name,
 			FileInputStream fis, double newMin, double newMax) {
 
+		if(show) System.out.println("-----------NORMALIZING processing : START");
 		if (path == null) {
 			path = cvsFilePath;
 			name = newCvsFileName;
@@ -156,15 +166,58 @@ public class CVSParser {
 					newLine = newLine + newVal + ";"; // utworzenie nowej lini
 				}
 
+				if(show) System.out.println(newLine.substring(0, newLine.length() - 1)+" DONE");
 				out.println(newLine.substring(0, newLine.length() - 1));
 			}
 
 			out.close();
+			if(show) System.out.println("-----------NORMALIZING processing : END");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public ArrayList<double[]> loadRecordsToList(String path, String name) {
+
+		FileInputStream fis = loadFile(path, name);
+		
+		if (fis==null) return null; else return loadRecordsToList(fis);
+
+	}
+
+	public ArrayList<double[]> loadRecordsToList(FileInputStream fis) {
+		InputStreamReader isr = null;
+		BufferedReader reader = null;
+		ArrayList<double[]> lista = new ArrayList<>();
+
+		try {
+			fis.getChannel().position(0);
+			isr = new InputStreamReader(fis);
+			reader = new BufferedReader(isr);
+
+			line = reader.readLine(); // pominiecie lini z nazwami kolumn
+
+			while ((line = reader.readLine()) != null) {
+
+				String[] col = line.split(separator);
+
+				double[] rec = new double[columnNumber];
+				for (int i = 0; i < col.length; i++) {
+					rec[i] = Double.parseDouble(col[i]);
+
+				}
+
+				lista.add(rec);
+			}
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		return lista;
 
 	}
 
@@ -177,7 +230,7 @@ public class CVSParser {
 			System.out.println(columnNames[i] + ":   MIN=" + tab[0] + "   MAX="
 					+ tab[1]);
 		}
-		System.out.println("\nPrzeczytano lacznie " + linesNumber + " lini");
+		System.out.println();
 	}
 
 	public void setComunicates(boolean s) {
@@ -217,7 +270,7 @@ public class CVSParser {
 	}
 
 	public static void main(String[] args) {
-		CVSParser cvsp = new CVSParser();
+		CSVParser cvsp = new CSVParser();
 		cvsp.setComunicates(false);
 
 		FileInputStream readFile = cvsp.loadFile(null, null);
@@ -227,6 +280,8 @@ public class CVSParser {
 		cvsp.showMap();
 
 		cvsp.procesNormalizeFile(null, null, readFile, 0, 1);
+		
+		System.out.println(cvsp.loadRecordsToList(readFile).size());
 
 		try {
 			readFile.close();

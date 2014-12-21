@@ -15,19 +15,36 @@ public class FCMMatrix {
 	private ArrayList<String> factorsNames; // tablica nazw czynnikow
 	private int actualIndex = 0; // index dla nastepnego elementu
 
+	private  FCMMatrix() {
+		// TODO Auto-generated constructor stub
+		factorsNames = new ArrayList<String>();
+	}
+	
 	public FCMMatrix(int numb) {
+		this();
 		numberOfFactors = numb;
 
 		fcmMatrix = new double[numberOfFactors][numberOfFactors];
-		factorsNames = new ArrayList<String>();
+		
 	}
 
 	public FCMMatrix(ArrayList<String> lista) {
+		this();
 		numberOfFactors = lista.size();
 
 		fcmMatrix = new double[numberOfFactors][numberOfFactors];
 
 		factorsNames = lista;
+	}
+	
+	public FCMMatrix(String[] lista) {
+		this();
+		numberOfFactors = lista.length;
+
+		fcmMatrix = new double[numberOfFactors][numberOfFactors];
+
+		for(int i=0;i<lista.length;i++)
+			factorsNames.add(lista[i]);
 	}
 
 	public int getNumberOfFactors() {
