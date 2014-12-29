@@ -1,12 +1,15 @@
 package pl.aiwd.model.fcm;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EmptyStackException;
 import java.util.Random;
 
 import pl.aiwd.parsers.map.FCMParser;
 
-public class FCMMatrix {
+public class FCMMatrix implements Comparable<FCMMatrix> {
 
 	private int numberOfFactors; // liczba czynnikow mapy
 
@@ -14,10 +17,16 @@ public class FCMMatrix {
 
 	private ArrayList<String> factorsNames; // tablica nazw czynnikow
 	private int actualIndex = 0; // index dla nastepnego elementu
+	
+	private double error=0;
+	private double fitnes=0;
+	
+	
 
 	private  FCMMatrix() {
 		// TODO Auto-generated constructor stub
 		factorsNames = new ArrayList<String>();
+		
 	}
 	
 	public FCMMatrix(int numb) {
@@ -69,6 +78,22 @@ public class FCMMatrix {
 
 	public void setFactorsNames(ArrayList<String> factorsNames) {
 		this.factorsNames = factorsNames;
+	}
+
+	public double getError() {
+		return error;
+	}
+
+	public void setError(double error) {
+		this.error = error;
+	}
+
+	public double getFitnes() {
+		return fitnes;
+	}
+
+	public void setFitnes(double fitnes) {
+		this.fitnes = fitnes;
 	}
 
 	public void addFactor(String name) throws FullFCMException {
@@ -136,7 +161,7 @@ public class FCMMatrix {
 			
 			s=s+"\n";
 		}
-		
+		s+="Blad = "+error+"\n Fitness = "+fitnes+"\n";
 		return s;
 	}
 
@@ -174,6 +199,12 @@ public class FCMMatrix {
 		}*/
 		
 		System.out.println(fcm.toString());
+	}
+
+	@Override
+	public int compareTo(FCMMatrix o) {
+		// TODO Auto-generated method stub
+		return Double.compare(this.fitnes, o.getFitnes());
 	}
 
 }

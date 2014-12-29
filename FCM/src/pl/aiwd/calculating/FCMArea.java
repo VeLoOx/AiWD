@@ -211,5 +211,32 @@ public class FCMArea {
 		
 	}
 	
+	public double computateJError(List<double[]> pattern, List<double[]> candidate){
+		
+		double error = 0;
+		int rec = 0; //liczba przetworzonych rekordow
+		int cnumb = pattern.get(0).length;
+		int recnumb = pattern.size();
+		for(int k=0;k<recnumb-1;k++){
+			rec++;
+			double[] cpat = pattern.get(k+1);
+			double[] ccat = candidate.get(k);
+			
+			for(int i=0;i<cnumb;i++){
+				error+= Math.pow(Math.abs(cpat[i]-ccat[i]),2) / ((recnumb-1)*cnumb);
+			}
+		}
+		if(show)System.out.println("\nLiczba par dla bledu = "+rec);
+		return error;
+	}
+	
+	public double computateJError(List<double[]> candidate){
+		return computateJError(normalizedPatternRecords,candidate);
+	}
+	
+	public double computateFitness(double val){
+		return 1/(val);
+	}
+	
 
 }

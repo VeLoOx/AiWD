@@ -1,9 +1,11 @@
 package pl.aiwd.test;
 
 import java.io.FileInputStream;
+import java.util.Collections;
 import java.util.List;
 
 import pl.aiwd.calculating.FCMArea;
+import pl.aiwd.calculating.GENArea;
 import pl.aiwd.model.fcm.FCMMatrix;
 import pl.aiwd.parsers.datafiles.CSVParser;
 
@@ -29,19 +31,33 @@ public class TestFcm {
 		FileInputStream readFileNorm = csvNormal.loadFile(csvFilePath, newCsvFileName);
 		/*przekopiowalem sobie liczbe kolumn zeby nie musiec znowy robic procesMinMaxFile()*/
 		csvNormal.setColumnNumber(csv.getColumnNumber()); 
-		
+		csvNormal.setColumnNames(csv.getColumnNames());
 		/*ustawienie znormalizowanej listy
 		 * mozna tez zrobic z poziomu FCMArea ale wole tak jakos jest 
 		 * bardziej przejzyscie, ale delegatow nie usuwalem*/
+		
 		FCMArea fcmarea = new FCMArea(csvNormal);
 		fcmarea.setNormalizedPatternRecords(csvNormal.loadRecordsToList(readFileNorm)); 
 		
 		System.out.println("Elementy na liscie");
 		fcmarea.showNormalizedPatternRecordList();
 		
+		fcmarea.setShow(false);
+		
+		GENArea gen = new GENArea(fcmarea);
+		gen.makePool(100);
+		gen.runFitnesCalculation();
+		
+		Collections.sort(gen.getPool());
+		int i=0;
+		for(FCMMatrix m : gen.getPool()){
+			System.out.println("Fitness "+i+" = "+m.getFitnes()+"  err="+m.getError());
+			i++;
+		}
+		
 			
 		//wybranie pierwszej (na probe) z macierzy z wygenerowanje puli
-		FCMMatrix matrix = fcmarea.initializeFCMMatrixPool(1, csv).get(0);
+		/*FCMMatrix matrix = fcmarea.initializeFCMMatrixPool(1, csv).get(0);
 		
 		System.out.println("NOWE CZYNNIKI !!!");
 		System.out.println(matrix.toString());
@@ -58,6 +74,10 @@ public class TestFcm {
 		}
 		
 		System.out.println(newFactorsVal.size());
+		
+		double err = fcmarea.computateJError(newFactorsVal);
+		System.out.print("Blad = "+err);
+		System.out.print("Fitness = "+fcmarea.computateFitness(err));*/
 	}
 
 }
