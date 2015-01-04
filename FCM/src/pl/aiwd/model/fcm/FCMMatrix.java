@@ -21,7 +21,7 @@ public class FCMMatrix implements Comparable<FCMMatrix> {
 	private double error=0;
 	private double fitnes=0;
 	
-	
+	private boolean chosen=false; //czy juz wybrany z populacji podczas selekcji
 
 	private  FCMMatrix() {
 		// TODO Auto-generated constructor stub
@@ -69,7 +69,12 @@ public class FCMMatrix implements Comparable<FCMMatrix> {
 	}
 
 	public void setFcmMatrix(double[][] fcmMatrix) {
-		this.fcmMatrix = fcmMatrix;
+		//this.fcmMatrix = fcmMatrix;
+		for(int i=0;i<this.fcmMatrix.length;i++){
+			for(int y=0;y<this.fcmMatrix[0].length;y++){
+				this.fcmMatrix[i][y] = fcmMatrix[i][y];
+			}
+		}
 	}
 
 	public ArrayList<String> getFactorsNames() {
@@ -94,6 +99,14 @@ public class FCMMatrix implements Comparable<FCMMatrix> {
 
 	public void setFitnes(double fitnes) {
 		this.fitnes = fitnes;
+	}
+
+	public boolean isChosen() {
+		return chosen;
+	}
+
+	public void setChosen(boolean chosen) {
+		this.chosen = chosen;
 	}
 
 	public void addFactor(String name) throws FullFCMException {

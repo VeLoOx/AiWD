@@ -8,6 +8,7 @@ import pl.aiwd.calculating.FCMArea;
 import pl.aiwd.calculating.GENArea;
 import pl.aiwd.model.fcm.FCMMatrix;
 import pl.aiwd.parsers.datafiles.CSVParser;
+import pl.aiwd.parsers.map.FCMParser;
 
 public class TestFcm {
 	
@@ -54,6 +55,29 @@ public class TestFcm {
 			System.out.println("Fitness "+i+" = "+m.getFitnes()+"  err="+m.getError());
 			i++;
 		}
+		
+		System.out.println("Sum Fitness = "+gen.getPoolFitness());
+		
+		System.out.println("SelFitness = "+gen.selection(gen.getPool()).getFitnes());
+		
+		FCMMatrix m1 = gen.selection(gen.getPool());
+		FCMMatrix m2 = gen.selection(gen.getPool());
+		
+		FCMParser.printVector(FCMParser.matrixToVector(m1.getFcmMatrix()));
+		FCMParser.printVector(FCMParser.matrixToVector(m2.getFcmMatrix()));
+		
+		FCMMatrix l = gen.crossover(m1, m2);
+		
+		
+			System.out.println("dziecko: "+l.getNumberOfFactors());
+			System.out.println(l.toString());
+			FCMParser.printVector(FCMParser.matrixToVector(l.getFcmMatrix()));
+			
+		boolean bylo = false;
+		while(!bylo){
+			bylo = gen.mutation(l);
+		}
+		System.out.println(l.toString());
 		
 			
 		//wybranie pierwszej (na probe) z macierzy z wygenerowanje puli

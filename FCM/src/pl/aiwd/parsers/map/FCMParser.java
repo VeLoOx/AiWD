@@ -2,7 +2,7 @@ package pl.aiwd.parsers.map;
 
 public class FCMParser {
 
-	public double[] matrixToVector(double[][] tab){
+	public static double[] matrixToVector(double[][] tab){
 		
 		int r = tab.length;
 		int c = tab[0].length;
@@ -22,7 +22,7 @@ public class FCMParser {
 		return vector;
 	}
 	
-	public double[][] vectorToMatrix(double[] vec, int r, int c){
+	public static double[][] vectorToMatrix(double[] vec, int r, int c){
 		double[][] matrix = new double[r][c];
 		
 		int ar=0; //aktualny wiersz
@@ -43,7 +43,7 @@ public class FCMParser {
 		return matrix;
 	}
 	
-	public void printVector(double[] tab){
+	public static void printVector(double[] tab){
 		System.out.println();
 		for(int i=0;i<tab.length;i++){
 			System.out.print(tab[i]+" - ");
