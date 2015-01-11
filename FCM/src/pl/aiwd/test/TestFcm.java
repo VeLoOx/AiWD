@@ -57,10 +57,31 @@ public class TestFcm {
 		}
 		
 		System.out.println("Sum Fitness = "+gen.getPoolFitness());
+		FCMMatrix m2 = gen.getPool().get(gen.getPool().size()-1);
+		System.out.println("Fitness "+i+" = "+m2.getFitnes()+"  err="+m2.getError());
+		double err2 = fcmarea.testMap(m2);
+		System.out.println("Error = % "+err2);
 		
-		System.out.println("SelFitness = "+gen.selection(gen.getPool()).getFitnes());
+		//gen.makeNewPopulation();
 		
-		FCMMatrix m1 = gen.selection(gen.getPool());
+		gen.runGA(300);
+		
+		gen.runFitnesCalculation();
+		Collections.sort(gen.getPool());
+	    i=0;
+		for(FCMMatrix m : gen.getPool()){
+			System.out.println("Fitness "+i+" = "+m.getFitnes()+"  err="+m.getError());
+			i++;
+		}
+		System.out.println("Sum Fitness = "+gen.getPoolFitness());
+		
+		FCMMatrix m = gen.getPool().get(gen.getPool().size()-1);
+		System.out.println("Fitness "+i+" = "+m.getFitnes()+"  err="+m.getError());
+		double err = fcmarea.testMap(m);
+		System.out.println("Error = % "+err);
+		//System.out.println("SelFitness = "+gen.selection(gen.getPool()).getFitnes());
+		
+		/*FCMMatrix m1 = gen.selection(gen.getPool());
 		FCMMatrix m2 = gen.selection(gen.getPool());
 		
 		FCMParser.printVector(FCMParser.matrixToVector(m1.getFcmMatrix()));
@@ -77,7 +98,7 @@ public class TestFcm {
 		while(!bylo){
 			bylo = gen.mutation(l);
 		}
-		System.out.println(l.toString());
+		System.out.println(l.toString());*/
 		
 			
 		//wybranie pierwszej (na probe) z macierzy z wygenerowanje puli

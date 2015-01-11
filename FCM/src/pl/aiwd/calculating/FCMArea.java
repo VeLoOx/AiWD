@@ -19,12 +19,14 @@ public class FCMArea {
 	
 	private List<double[]> patternRecords; /*rekrdy wzorcowe*/
 	private List<double[]> normalizedPatternRecords; /*rekordy wzorcowe znormalizowane*/
+	private List<double[]> normalizedTestPatternRecords;
 	private List<double[]> computatedRecords; /*rekordy wyliczone (wzorcowe-1)*/
 	
 	private FCMParser fcmParser;
 	private CSVParser csvNormalizedParser; //parser od znormalizowanych rekordow
 	private CSVParser csvParser; //parser od znormalizowanych rekordow
 	private Tranformator transformator;
+	private double testPart = 0.1;
 	
 	private boolean show=true;
 	
@@ -34,6 +36,7 @@ public class FCMArea {
 		csvParser = new CSVParser();
 		
 		transformator = new Tranformator(new LogisticTransform());
+		normalizedTestPatternRecords = new ArrayList<>();
 	}
 	
 	public FCMArea(CSVParser normalized){
@@ -99,6 +102,10 @@ public class FCMArea {
 
 	public void setNormalizedPatternRecords(List<double[]> normalizedPatternRecords) {
 		this.normalizedPatternRecords = normalizedPatternRecords;
+		int numb =(int) (testPart*this.normalizedPatternRecords.size());
+		for(int pos=0;pos<numb;pos++){
+			normalizedTestPatternRecords.add(this.normalizedPatternRecords.remove(pos));
+		}
 	}
 
 	public FCMParser getFcmParser() {
@@ -146,12 +153,33 @@ public class FCMArea {
 	
 	public void loadNormalizedPatternRecords(){
 		normalizedPatternRecords = csvNormalizedParser.loadRecordsToList(pathNormalizePattern, nameNormalizePattern);
+		int numb =(int) (testPart*normalizedPatternRecords.size());
+		for(int pos=0;pos<numb;pos++){
+			normalizedTestPatternRecords.add(normalizedPatternRecords.remove(pos));
+		}
 	}
 	
 	public void loadNormalizedPatternRecords(String pnp, String nnp){
 		normalizedPatternRecords = csvNormalizedParser.loadRecordsToList(pnp, nnp);
 	}
 	
+	public List<double[]> getNormalizedTestPatternRecords() {
+		return normalizedTestPatternRecords;
+	}
+
+	public void setNormalizedTestPatternRecords(
+			List<double[]> normalizedTestPatternRecords) {
+		this.normalizedTestPatternRecords = normalizedTestPatternRecords;
+	}
+
+	public double getTestPart() {
+		return testPart;
+	}
+
+	public void setTestPart(double testPart) {
+		this.testPart = testPart;
+	}
+
 	public void showNormalizedPatternRecordList(){
 		for (double[] d : normalizedPatternRecords){
 			String line = "";
@@ -169,7 +197,7 @@ public class FCMArea {
 		
 		for(int i=0;i<number;i++){
 			FCMMatrix fcm = new FCMMatrix(cvs.getColumnNames());
-			fcm.initializeFCMMatrix(-0.2, 0.2, 0.05, 3);
+			fcm.initializeFCMMatrix(-0.9, 0.9, 0.01, 3);
 			list.add(fcm);
 		}
 		
@@ -187,7 +215,7 @@ public class FCMArea {
 		while(it.hasNext()){
 			double[] rec = it.next();
 			double[] newRec = new double[rec.length];
-			System.out.println("-------");
+			//System.out.println("-------");
 			for(int i=0;i<rec.length;i++){
 				double sum=0;
 				String line="";
@@ -209,6 +237,33 @@ public class FCMArea {
 	public List<double[]> computateNewFactors(FCMMatrix matrix){
 		return computateNewFactors(normalizedPatternRecords, matrix);
 		
+	}
+	
+	public double testMap(FCMMatrix m){
+		
+		List<double[]> newFact = computateNewFactors(normalizedTestPatternRecords, m);//nowe rekordy na podst tesu i mapy
+		
+		int recnumb = newFact.size();
+		int cnumb = newFact.get(0).length;
+		double error = 0;
+		
+		double sum = 0;
+		
+		for (int r=0;r<recnumb-1;r++){
+			sum = 0;
+		double[] rec = normalizedPatternRecords.get(r+1);
+		double[] newr = newFact.get(r);
+		for(int i=0;i<cnumb;i++){
+			double val = Math.pow((rec[i]-newr[i]),2)/cnumb;
+			sum = sum+val;
+		}
+		
+		error = error+sum;
+		}
+		
+		double val2 =  error/recnumb;
+		error = val2 * 100;
+		return error;
 	}
 	
 	public double computateJError(List<double[]> pattern, List<double[]> candidate){

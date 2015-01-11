@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class CSVParser {
 
-	private String separator = ";";
+	private String separator = ",";
 	private String cvsFilePath = "D:\\Studia\\przedmioty2_2\\AiWD\\Projekt2\\git\\FCM\\Data\\";
 	private String cvsFileName = "data.csv";
 	private String newCvsFileName = "normalizedata.csv";
@@ -163,7 +163,7 @@ public class CSVParser {
 					String newVal = takeNumbNormalizeAndRetString(col[i],
 							mm[0], mm[1], newMin, newMax);
 
-					newLine = newLine + newVal + ";"; // utworzenie nowej lini
+					newLine = newLine + newVal + ","; // utworzenie nowej lini
 				}
 
 				if(show) System.out.println(newLine.substring(0, newLine.length() - 1)+" DONE");
