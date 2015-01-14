@@ -1,9 +1,11 @@
 package pl.aiwd.controler;
 
 import java.io.FileInputStream;
+import java.util.Collections;
 
 import pl.aiwd.calculating.FCMArea;
 import pl.aiwd.calculating.GENArea;
+import pl.aiwd.model.fcm.FCMMatrix;
 import pl.aiwd.parsers.datafiles.CSVParser;
 import sun.security.jca.GetInstance;
 
@@ -23,6 +25,15 @@ public class Controler {
 	FCMArea fcmarea = null;
 	GENArea gen = null;
 	
+	public double fitbef;
+	public double fitaft;
+	public double errbef;
+	public double erraft;
+	public double time;
+	public int iteration;
+	public FCMMatrix mbef;
+	public FCMMatrix maft;
+	
 	private String message = "";
 	
 	private Controler(){
@@ -31,6 +42,54 @@ public class Controler {
 		
 		csvNormal = new CSVParser();
 		csvNormal.setComunicates(false);
+	}
+	
+	public void runGA(int iter, int pool){
+		gen.makePool(pool);
+		gen.runFitnesCalculation();
+		Collections.sort(gen.getPool());
+		mbef = gen.getPool().get(gen.getPool().size()-1);
+		//System.out.println(+m2.getFitnes()+"  err="+m2.getError());
+		fitbef = mbef.getFitnes();
+		double err2 = fcmarea.testMap(mbef);
+		errbef = err2;
+		//System.out.println("Error = % "+err2);
+		double t1 = System.currentTimeMillis();
+		iteration = gen.runGA(iter);
+		double t2 = System.currentTimeMillis();
+		time = t2-t1;
+		
+		gen.runFitnesCalculation();
+		Collections.sort(gen.getPool());
+		maft = gen.getPool().get(gen.getPool().size()-1);
+		fitaft =  maft.getFitnes();
+		double err3 = fcmarea.testMap( maft);
+		erraft = err3;
+		
+	}
+	
+	public void runGA(double fit, int pool){
+		gen.makePool(pool);
+		gen.runFitnesCalculation();
+		Collections.sort(gen.getPool());
+		mbef = gen.getPool().get(gen.getPool().size()-1);
+		//System.out.println(+m2.getFitnes()+"  err="+m2.getError());
+		fitbef = mbef.getFitnes();
+		double err2 = fcmarea.testMap(mbef);
+		errbef = err2;
+		//System.out.println("Error = % "+err2);
+		double t1 = System.currentTimeMillis();
+		iteration = gen.runGA(fit);
+		double t2 = System.currentTimeMillis();
+		time = t2-t1;
+		
+		gen.runFitnesCalculation();
+		Collections.sort(gen.getPool());
+		maft = gen.getPool().get(gen.getPool().size()-1);
+		fitaft =  maft.getFitnes();
+		double err3 = fcmarea.testMap( maft);
+		erraft = err3;
+		
 	}
 	
 	public String loadData(String path, String name){
@@ -57,9 +116,11 @@ public class Controler {
 		csvNormal.setColumnNumber(csv.getColumnNumber()); 
 		csvNormal.setColumnNames(csv.getColumnNames());
 		fcmarea = new FCMArea(csvNormal);
+		fcmarea.setShow(false);
 		fcmarea.setNormalizedPatternRecords(csvNormal.loadRecordsToList(readFileNorm)); 
 		fcmarea.setPatternRecords(csv.loadRecordsToList(readFile));
 		fcmarea.showNormalizedPatternRecordList();
+		gen = new GENArea(fcmarea);
 		return true;
 	}
 	

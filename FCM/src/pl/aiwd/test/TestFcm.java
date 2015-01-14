@@ -56,9 +56,11 @@ public class TestFcm {
 			i++;
 		}
 		
+		
 		System.out.println("Sum Fitness = "+gen.getPoolFitness());
 		FCMMatrix m2 = gen.getPool().get(gen.getPool().size()-1);
-		System.out.println("Fitness "+i+" = "+m2.getFitnes()+"  err="+m2.getError());
+		System.out.println(m2.toString());
+		/*System.out.println("Fitness "+i+" = "+m2.getFitnes()+"  err="+m2.getError());
 		double err2 = fcmarea.testMap(m2);
 		System.out.println("Error = % "+err2);
 		
@@ -78,7 +80,7 @@ public class TestFcm {
 		FCMMatrix m = gen.getPool().get(gen.getPool().size()-1);
 		System.out.println("Fitness "+i+" = "+m.getFitnes()+"  err="+m.getError());
 		double err = fcmarea.testMap(m);
-		System.out.println("Error = % "+err);
+		System.out.println("Error = % "+err);*/
 		//System.out.println("SelFitness = "+gen.selection(gen.getPool()).getFitnes());
 		
 		/*FCMMatrix m1 = gen.selection(gen.getPool());

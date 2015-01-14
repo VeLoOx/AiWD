@@ -126,26 +126,43 @@ public class GENArea {
 		return null;
 	}
 	
-	public void runGA(int n){
+	public int runGA(int n){
 		for(int i=0;i<n;i++){
-			
+			if(i>=maxIteration) {
+				this.runFitnesCalculation();
+				Collections.sort(this.getPool());
+				this.getPool().get(this.getPoolSize()-1).getFitnes();
+				maxIteration=1000;
+				return i;
+				}
 			this.runFitnesCalculation();
 			Collections.sort(this.getPool());
 			
 			this.makeNewPopulation();
 		}
+		
+		return n;
 	}
 	
-	public void runGA(double fit){
+	public int runGA(double fit){
 		double f = Double.MIN_VALUE;
 		int it = 0;
-		while( (f<fit) || (it<maxIteration)){
+		while( (f<fit)){
+			if(it>=maxIteration) {
+				this.runFitnesCalculation();
+				Collections.sort(this.getPool());
+				f = this.getPool().get(this.getPoolSize()-1).getFitnes();
+				maxIteration=1000;
+				break;
+				}
 			it++;
 			this.runFitnesCalculation();
 			Collections.sort(this.getPool());
 			f = this.getPool().get(this.getPoolSize()-1).getFitnes();
 			this.makeNewPopulation();
 		}
+		
+		return it;
 	}
 	
 	public void makeNewPopulation(){

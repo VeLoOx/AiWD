@@ -12,6 +12,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -30,6 +31,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialogs;
 
 import pl.aiwd.controler.Controler;
@@ -63,6 +65,7 @@ public class MainScene {
 	private Label labelErrAftGen;
 	private Label time;
 	private Label iterations;
+	private Label running;
 	
 	private TextField tfPopulation;
 	private TextField tfIteration;
@@ -79,6 +82,9 @@ public class MainScene {
 	TabPane tabPane;
 	VBox vbdata;
 	VBox vbnormaldata;
+	Tab tabData; 
+	Tab tabNormalizedData; 
+	Tab tabMaps; 
 	//panel prawy
 	
 
@@ -98,7 +104,7 @@ public class MainScene {
 		menuFile = new Menu("File");
 		loadData = new MenuItem("Load data");
 		loadNormalizedData = new MenuItem("Load normalized data");
-		menuFile.getItems().addAll(loadData,loadNormalizedData);
+		menuFile.getItems().addAll(loadData);
 		loadData.setOnAction(loadDataClick());
 		
 		menuData = new Menu("Data");
@@ -116,10 +122,10 @@ public class MainScene {
 		labelPopulation = new Label("Population");
 		labelFunctionShape = new Label("Func Shape");
 		
-		tfFitness = new TextField();
-		tfIteration = new TextField();
-		tfPopulation = new TextField();
-		tfFunctionShape = new TextField();
+		tfFitness = new TextField("15");
+		tfIteration = new TextField("50");
+		tfPopulation = new TextField("50");
+		tfFunctionShape = new TextField("5");
 		
 		ToggleGroup radioGroup = new ToggleGroup();
 		radioFitness = new RadioButton("Fitness");
@@ -129,7 +135,9 @@ public class MainScene {
 		radioIterations.setToggleGroup(radioGroup);
 		
 		startButton = new Button("Start");
+		startButton.setOnAction(startClick());
 		stopButton = new Button("Stop");
+		stopButton.setOnAction(stopClick());
 		
 		VBox vLeftBox = new VBox();
 		GridPane leftGrid = new GridPane();
@@ -172,7 +180,7 @@ public class MainScene {
 		buttons.setPadding(new Insets(10,10,10,10));
 		buttons.setCenterShape(true);
 		
-		buttons.getChildren().addAll(startButton,stopButton);
+		buttons.getChildren().addAll(startButton);
 		vLeftBox.getChildren().add(new Separator());
 		vLeftBox.getChildren().add(buttons);
 		vLeftBox.getChildren().add(new Separator());
@@ -184,6 +192,7 @@ public class MainScene {
 		labelErrAftGen = new Label("Error MAP after learnig = NA");;
 		time = new Label("Time = NA");;
 		iterations = new Label("Iteations = NA");
+		running = new Label("NO RUNING");
 		
 		GridPane leftGrid2 = new GridPane();
 		leftGrid2.setVgap(5);
@@ -206,8 +215,9 @@ public class MainScene {
 		
 		// srodek
 		tabPane = new TabPane();
-		Tab tabData = new Tab("Data");
-		Tab tabNormalizedData = new Tab("Normalized Data");
+		tabData = new Tab("Data");
+		tabNormalizedData = new Tab("Normalized Data");
+		tabMaps = new Tab("Maps");
 		
 		VBox vData = new VBox();
 		vData.getChildren().add(new Label("Data"));
@@ -228,6 +238,7 @@ public class MainScene {
 		
 		tabPane.getTabs().add(tabData);
 		tabPane.getTabs().add(tabNormalizedData);
+		tabPane.getTabs().add(tabMaps);
 		
 		
 		
@@ -350,5 +361,75 @@ private EventHandler<ActionEvent> normalizeClick(){
 	        }
 		};
 	}
+
+private EventHandler<ActionEvent> startClick(){
+	
+	return new EventHandler<ActionEvent>() {
+		@Override
+        public void handle(ActionEvent event) {
+			
+				
+			
+            
+            	int pool = Integer.parseInt(tfPopulation.getText());
+            	double fit = Double.parseDouble(tfFitness.getText());
+            	int iter = Integer.parseInt(tfIteration.getText());
+            	int shape = Integer.parseInt(tfFunctionShape.getText());
+            	
+            	
+            	running.setText("RUNNING");
+            	if(radioIterations.isSelected())
+            	Controler.getInstance().runGA(iter, pool); else Controler.getInstance().runGA(fit, pool);
+            	
+            	
+            	
+            	labelFitnesBefGen.setText("Fitness before learnig = "+Controler.getInstance().fitbef);
+        		labelFitnesAftGen.setText("Fitness after learnig = "+Controler.getInstance().fitaft); 
+        		labelErrBefGen.setText("Error MAP before learnig = "+Controler.getInstance().errbef +"%"); 
+        		labelErrAftGen.setText("Error MAP after learnig = "+Controler.getInstance().erraft +"%"); 
+        		time.setText("Time (s) = "+(Controler.getInstance().time/1000));
+        		iterations.setText("Iteations = "+Controler.getInstance().iteration);
+        		running.setText("NOT RUNNING");
+        		
+        		VBox mapBox1 = new VBox(10);
+        		HBox hb1 = new HBox();
+        		mapBox1.getChildren().add(new Label("Map before learnign"));
+        		Label ml = new Label(Controler.getInstance().mbef.toString());
+        		mapBox1.getChildren().add(ml);
+        		
+        		VBox mapBox2 = new VBox(10);
+        		mapBox2.getChildren().add(new Label("Map after learnign"));
+        		Label ma = new Label(Controler.getInstance().maft.toString());
+        		mapBox2.getChildren().add(ma);
+        		
+        		hb1.getChildren().add(mapBox1);
+        		hb1.getChildren().add(mapBox2);
+        		
+        		tabMaps.setContent(hb1);
+        		
+          
+        }
+	};
+}
+
+private EventHandler<ActionEvent> stopClick(){
+	
+	return new EventHandler<ActionEvent>() {
+		@Override
+        public void handle(ActionEvent event) {
+			
+            	Controler.getInstance().getGen().setMaxIteration(-1);
+            	
+            	labelFitnesBefGen.setText("Fitness before learnig = "+Controler.getInstance().fitbef);
+        		labelFitnesAftGen.setText("Fitness after learnig = "+Controler.getInstance().fitaft); 
+        		labelErrBefGen.setText("Error MAP before learnig = "+Controler.getInstance().errbef +"%"); 
+        		labelErrAftGen.setText("Error MAP after learnig = "+Controler.getInstance().erraft +"%"); 
+        		time.setText("Time (s) = "+(Controler.getInstance().time/1000));
+        		iterations.setText("Iteations = "+Controler.getInstance().iteration);
+        		running.setText("NOT RUNNING");
+          
+        }
+	};
+}
 
 }
