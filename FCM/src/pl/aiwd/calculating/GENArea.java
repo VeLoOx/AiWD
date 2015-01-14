@@ -12,7 +12,7 @@ import pl.aiwd.parsers.map.FCMParser;
 public class GENArea {
 
 	private int poolSize = 10;
-	private int maxIteration = 100;
+	private int maxIteration = 1000;
 
 	private double sumFit = 0;
 
@@ -132,6 +132,18 @@ public class GENArea {
 			this.runFitnesCalculation();
 			Collections.sort(this.getPool());
 			
+			this.makeNewPopulation();
+		}
+	}
+	
+	public void runGA(double fit){
+		double f = Double.MIN_VALUE;
+		int it = 0;
+		while( (f<fit) || (it<maxIteration)){
+			it++;
+			this.runFitnesCalculation();
+			Collections.sort(this.getPool());
+			f = this.getPool().get(this.getPoolSize()-1).getFitnes();
 			this.makeNewPopulation();
 		}
 	}
